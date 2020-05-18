@@ -19,4 +19,6 @@ type Transaction struct {
 	CategoryID int
 	AccountID  int
 	Date       time.Time
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }

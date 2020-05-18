@@ -18,22 +18,43 @@ func NewRepository() (Repository, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer db.Close()
+
+	// Migrate the schema
+	db.AutoMigrate(&entity.Transaction{})
 
 	return &repository{db}, nil
 }
 
 func (r *repository) Find(id entity.ID) (*entity.Transaction, error) {
-	return nil, nil
+	var tr *entity.Transaction
+	err := r.db.First(&tr, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return tr, nil
 }
 
 func (r *repository) FindAll() ([]*entity.Transaction, error) {
-	return nil, nil
+	var trs = []*entity.Transaction{}
+	err := r.db.Find(&trs).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return trs, nil
 }
 
 func (r *repository) Update(transaction *entity.Transaction) error {
-	return nil
+
+	return r.db.Save(&transaction).Error
 }
 
 func (r *repository) Store(transaction *entity.Transaction) (entity.ID, error) {
-	return "", nil
+	err := r.db.Create(&transaction).Error
+	if err != nil {
+		return "", err
+	}
+	return transaction.ID, nil
 }
