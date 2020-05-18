@@ -12,17 +12,17 @@ type service struct {
 }
 
 func (s *service) Find(id entity.ID) (*entity.Transaction, error) {
-	return nil, nil
+	return s.repo.Find(id)
 }
 
 func (s *service) FindAll() ([]*entity.Transaction, error) {
-	return nil, nil
+	return s.repo.FindAll()
 }
 
 func (s *service) Update(transaction *entity.Transaction) error {
-	return nil
+	return s.repo.Update(transaction)
 }
 
 func (s *service) Store(transaction *entity.Transaction) (entity.ID, error) {
-	return "", nil
+	return s.repo.Store(transaction)
 }
