@@ -1,19 +1,21 @@
 package main
 
 import (
-	"encoding/json"
+	"log"
 	"net/http"
+
+	"github.com/leogsouza/expenses-tracking/server/internal/router"
 )
+
+var port = "8080"
 
 func main() {
 
-	http.HandleFunc("/", healthcheck)
+	r := router.New()
 
-	http.ListenAndServe(":8080", nil)
+	log.Printf("accepting connections on port %s", port)
+	if err := http.ListenAndServe(":"+port, r); err != nil {
+		log.Fatalf("could not start server: %v\n", err)
+	}
 
-}
-
-func healthcheck(w http.ResponseWriter, r *http.Request) {
-
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }

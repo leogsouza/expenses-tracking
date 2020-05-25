@@ -11,6 +11,10 @@ type service struct {
 	repo Repository
 }
 
+func NewService(repo Repository) Service {
+	return &service{repo}
+}
+
 func (s *service) Find(id entity.ID) (*entity.Transaction, error) {
 	return s.repo.Find(id)
 }

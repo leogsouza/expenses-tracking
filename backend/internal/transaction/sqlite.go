@@ -18,7 +18,7 @@ func NewRepository() (Repository, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	//defer db.Close()
 
 	// Migrate the schema
 	db.AutoMigrate(&entity.Transaction{})
