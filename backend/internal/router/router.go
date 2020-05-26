@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -12,17 +11,18 @@ import (
 	"github.com/leogsouza/expenses-tracking/server/internal/transaction"
 )
 
+var logger = httplog.NewLogger("httplog-example", httplog.Options{
+	JSON: true,
+	//Concise: true,
+	// Tags: map[string]string{
+	// 	"version": "v1.0-81aa4244d9fc8076a",
+	// 	"env":     "dev",
+	// },
+})
+
 func New() http.Handler {
 
 	// Logger
-	logger := httplog.NewLogger("httplog-example", httplog.Options{
-		JSON: true,
-		//Concise: true,
-		// Tags: map[string]string{
-		// 	"version": "v1.0-81aa4244d9fc8076a",
-		// 	"env":     "dev",
-		// },
-	})
 
 	r := chi.NewRouter()
 
@@ -32,13 +32,6 @@ func New() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(httplog.RequestLogger(logger))
 	r.Use(middleware.Heartbeat("/ping"))
-
-	repo, err := transaction.NewRepository()
-	if err != nil {
-		log.Fatal(err)
-	}
-	serv := transaction.NewService(repo)
-	trHandler := transaction.NewHandler(serv)
 
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -52,7 +45,7 @@ func New() http.Handler {
 
 	r.Get("/", healthcheck)
 	r.Route("/api", func(r chi.Router) {
-		r.Mount("/transactions", trHandler.Routes())
+		r.Mount("/transactions", transactionRoutes())
 	})
 	return r
 
@@ -61,4 +54,15 @@ func New() http.Handler {
 func healthcheck(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}
+
+func transactionRoutes() http.Handler {
+	repo, err := transaction.NewRepository()
+	if err != nil {
+		logger.Fatal().Err(err)
+	}
+
+	serv := transaction.NewService(repo)
+
+	return transaction.NewHandler(serv).Routes()
 }
