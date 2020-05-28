@@ -12,16 +12,7 @@ type repository struct {
 }
 
 // NewRepository returns the repository instance
-func NewRepository() (Repository, error) {
-	db, err := gorm.Open("sqlite3", "expenses.db")
-
-	if err != nil {
-		return nil, err
-	}
-	//defer db.Close()
-
-	// Migrate the schema
-	db.AutoMigrate(&entity.Transaction{})
+func NewRepository(db *gorm.DB) (Repository, error) {
 
 	return &repository{db}, nil
 }

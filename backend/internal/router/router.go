@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httplog"
+	"github.com/jinzhu/gorm"
 	"github.com/leogsouza/expenses-tracking/server/internal/transaction"
 )
 
@@ -20,9 +21,7 @@ var logger = httplog.NewLogger("httplog-example", httplog.Options{
 	// },
 })
 
-func New() http.Handler {
-
-	// Logger
+func New(db *gorm.DB) http.Handler {
 
 	r := chi.NewRouter()
 
@@ -45,7 +44,7 @@ func New() http.Handler {
 
 	r.Get("/", healthcheck)
 	r.Route("/api", func(r chi.Router) {
-		r.Mount("/transactions", transactionRoutes())
+		r.Mount("/transactions", transactionRoutes(db))
 	})
 	return r
 
@@ -56,8 +55,8 @@ func healthcheck(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
-func transactionRoutes() http.Handler {
-	repo, err := transaction.NewRepository()
+func transactionRoutes(db *gorm.DB) http.Handler {
+	repo, err := transaction.NewRepository(db)
 	if err != nil {
 		logger.Fatal().Err(err)
 	}
