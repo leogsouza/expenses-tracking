@@ -1,28 +1,71 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jinzhu/gorm"
-	"github.com/leogsouza/expenses-tracking/server/internal/entity"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/leogsouza/expenses-tracking/server/internal/router"
 )
 
-var port = "8080"
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
+}
+
+type Config struct {
+	PostgresDB       string `envconfig:"POSTGRES_DB"`
+	PostgresUser     string `envconfig:"POSTGRES_USER"`
+	PostgresPassword string `envconfig:"POSTGRES_PASSWORD"`
+	PostgresPort     string `envconfig:"POSTGRES_PORT"`
+}
 
 func main() {
 
-	// Logger
-	db, err := gorm.Open("sqlite3", "expenses.db")
-
+	var cfg Config
+	err := envconfig.Process("", &cfg)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	var (
+		databaseAddr = fmt.Sprintf("host=127.0.0.1 port=%s user=%s dbname=%s password=%s sslmode=disable",
+			cfg.PostgresPort, cfg.PostgresUser, cfg.PostgresDB, cfg.PostgresPassword)
+		port = env("PORT", "8080")
+	)
+
+	// Logger
+	fmt.Println(databaseAddr)
+	db, err := gorm.Open("postgres", databaseAddr)
+
+	if err != nil {
+		log.Fatalf("could not open db connection: %v\n", err)
+		return
 	}
 	defer db.Close()
 
 	// Migrate the schema
-	db.AutoMigrate(&entity.Transaction{})
+	err = dbMigration(db.DB())
+	if err != nil {
+		log.Fatalf("could not proecess the db migration: %v\n", err)
+		return
+	}
+
+	if err = db.DB().Ping(); err != nil {
+		log.Fatalf("could not ping to db: %v\n", err)
+		return
+	}
 
 	r := router.New(db)
 
@@ -31,4 +74,38 @@ func main() {
 		log.Fatalf("could not start server: %v\n", err)
 	}
 
+}
+
+func env(key, fallbackValue string) string {
+	s := os.Getenv(key)
+	if s == "" {
+		return fallbackValue
+	}
+
+	return s
+}
+
+func dbMigration(db *sql.DB) error {
+
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		log.Fatalf("could not get db driver instance: %v", err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://db/migrations",
+		"expenses",
+		driver)
+	log.Println("Initiation migration")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	log.Println("Executing migration")
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal(err)
+		return err
+	}
+	return nil
 }
