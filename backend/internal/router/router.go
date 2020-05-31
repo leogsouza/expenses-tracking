@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/httplog"
 	"github.com/jinzhu/gorm"
 	"github.com/leogsouza/expenses-tracking/server/internal/transaction"
+	"github.com/leogsouza/expenses-tracking/server/internal/user"
 )
 
 var logger = httplog.NewLogger("httplog-example", httplog.Options{
@@ -45,6 +46,7 @@ func New(db *gorm.DB) http.Handler {
 	r.Get("/", healthcheck)
 	r.Route("/api", func(r chi.Router) {
 		r.Mount("/transactions", transactionRoutes(db))
+		r.Mount("/users", userRoutes(db))
 	})
 	return r
 
@@ -64,4 +66,15 @@ func transactionRoutes(db *gorm.DB) http.Handler {
 	serv := transaction.NewService(repo)
 
 	return transaction.NewHandler(serv).Routes()
+}
+
+func userRoutes(db *gorm.DB) http.Handler {
+	repo, err := user.NewRepository(db)
+	if err != nil {
+		logger.Fatal().Err(err)
+	}
+
+	serv := user.NewService(repo)
+
+	return user.NewHandler(serv).Routes()
 }
