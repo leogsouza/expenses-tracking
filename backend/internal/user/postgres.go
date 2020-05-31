@@ -17,17 +17,17 @@ func NewRepository(db *gorm.DB) (Repository, error) {
 	return &repository{db}, nil
 }
 
-func (r *repository) Find(id entity.ID) (*entity.User, error) {
-	var user *entity.User
-	err := r.db.First(&user, id).Error
+func (r *repository) Find(id entity.ID) (entity.User, error) {
+	var user entity.User
+	err := r.db.Where("id = ?", id).First(&user).Error
 	if err != nil {
-		return nil, err
+		return user, err
 	}
 	return user, nil
 }
 
-func (r *repository) FindAll() ([]*entity.User, error) {
-	var users = []*entity.User{}
+func (r *repository) FindAll() ([]entity.User, error) {
+	var users = []entity.User{}
 	err := r.db.Find(&users).Error
 
 	if err != nil {

@@ -11,15 +11,16 @@ type service struct {
 	repo Repository
 }
 
+// NewService create a instance of this service
 func NewService(repo Repository) Service {
 	return &service{repo}
 }
 
-func (s *service) Find(id entity.ID) (*entity.User, error) {
+func (s *service) Find(id entity.ID) (entity.User, error) {
 	return s.repo.Find(id)
 }
 
-func (s *service) FindAll() ([]*entity.User, error) {
+func (s *service) FindAll() ([]entity.User, error) {
 	return s.repo.FindAll()
 }
 
