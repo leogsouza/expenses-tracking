@@ -15,11 +15,11 @@ func NewService(repo Repository) Service {
 	return &service{repo}
 }
 
-func (s *service) Find(id entity.ID) (*entity.Transaction, error) {
+func (s *service) Find(id entity.ID) (entity.Transaction, error) {
 	return s.repo.Find(id)
 }
 
-func (s *service) FindAll() ([]*entity.Transaction, error) {
+func (s *service) FindAll() ([]entity.Transaction, error) {
 	return s.repo.FindAll()
 }
 

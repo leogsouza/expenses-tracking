@@ -13,6 +13,8 @@ import (
 	"github.com/go-chi/chi"
 )
 
+var GetURLParam = chi.URLParam
+
 type Router interface {
 	Routes() chi.Router
 }
@@ -29,6 +31,7 @@ func (h *handler) Routes() chi.Router {
 	r := chi.NewRouter()
 
 	r.Get("/", h.GetAll)
+	r.Get("/{id}", h.Get)
 	r.Post("/", h.Save)
 	return r
 }
@@ -39,6 +42,16 @@ func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 		responses.RespondError(w, fmt.Errorf("could not retrieve transactions: %v", err), http.StatusInternalServerError)
 		return
 	}
+	responses.RespondOK(w, out)
+}
+
+func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
+	out, err := h.service.Find(entity.ID(GetURLParam(r, "id")))
+	if err != nil {
+		responses.RespondError(w, fmt.Errorf("could not retrieve a transaction: %v", err), http.StatusNotFound)
+		return
+	}
+
 	responses.RespondOK(w, out)
 }
 

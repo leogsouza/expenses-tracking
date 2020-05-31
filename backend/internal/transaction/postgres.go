@@ -17,21 +17,21 @@ func NewRepository(db *gorm.DB) (Repository, error) {
 	return &repository{db}, nil
 }
 
-func (r *repository) Find(id entity.ID) (*entity.Transaction, error) {
-	var tr *entity.Transaction
-	err := r.db.First(&tr, id).Error
+func (r *repository) Find(id entity.ID) (entity.Transaction, error) {
+	var tr entity.Transaction
+	err := r.db.Debug().Where("id = ?", id).First(&tr).Error
 	if err != nil {
-		return nil, err
+		return tr, err
 	}
 	return tr, nil
 }
 
-func (r *repository) FindAll() ([]*entity.Transaction, error) {
-	var trs = []*entity.Transaction{}
+func (r *repository) FindAll() ([]entity.Transaction, error) {
+	var trs = []entity.Transaction{}
 	err := r.db.Find(&trs).Error
 
 	if err != nil {
-		return nil, err
+		return trs, err
 	}
 
 	return trs, nil

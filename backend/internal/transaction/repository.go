@@ -6,8 +6,8 @@ import (
 
 // Reader is the interface that wraps the basic find data methods
 type Reader interface {
-	Find(id entity.ID) (*entity.Transaction, error)
-	FindAll() ([]*entity.Transaction, error)
+	Find(id entity.ID) (entity.Transaction, error)
+	FindAll() ([]entity.Transaction, error)
 }
 
 // Writer is the interface that wraps the basic write data methods
