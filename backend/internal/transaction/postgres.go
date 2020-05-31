@@ -19,7 +19,7 @@ func NewRepository(db *gorm.DB) (Repository, error) {
 
 func (r *repository) Find(id entity.ID) (entity.Transaction, error) {
 	var tr entity.Transaction
-	err := r.db.Debug().Where("id = ?", id).First(&tr).Error
+	err := r.db.Where("id = ?", id).First(&tr).Error
 	if err != nil {
 		return tr, err
 	}

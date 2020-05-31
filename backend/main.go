@@ -47,7 +47,6 @@ func main() {
 	)
 
 	// Logger
-	fmt.Println(databaseAddr)
 	db, err := gorm.Open("postgres", databaseAddr)
 
 	if err != nil {
