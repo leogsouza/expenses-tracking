@@ -25,6 +25,7 @@ func init() {
 }
 
 type Config struct {
+	PostgresHost     string `envconfig:"POSTGRES_HOST"`
 	PostgresDB       string `envconfig:"POSTGRES_DB"`
 	PostgresUser     string `envconfig:"POSTGRES_USER"`
 	PostgresPassword string `envconfig:"POSTGRES_PASSWORD"`
@@ -40,8 +41,8 @@ func main() {
 	}
 
 	var (
-		databaseAddr = fmt.Sprintf("host=127.0.0.1 port=%s user=%s dbname=%s password=%s sslmode=disable",
-			cfg.PostgresPort, cfg.PostgresUser, cfg.PostgresDB, cfg.PostgresPassword)
+		databaseAddr = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+			cfg.PostgresHost, cfg.PostgresPort, cfg.PostgresUser, cfg.PostgresDB, cfg.PostgresPassword)
 		port = env("PORT", "8080")
 	)
 

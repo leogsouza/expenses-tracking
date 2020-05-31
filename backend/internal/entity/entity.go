@@ -8,7 +8,11 @@ import (
 type ID string
 
 // GenerateID returns a new UUID as string
-func GenerateID() string {
+func GenerateID() ID {
 
-	return ksuid.New().String()
+	return ID(ksuid.New().String())
+}
+
+func (i ID) String() string {
+	return string(i)
 }

@@ -3,7 +3,7 @@ package transaction
 import (
 	"github.com/jinzhu/gorm"
 	// to use sqlite with gorm
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/leogsouza/expenses-tracking/server/internal/entity"
 )
 
