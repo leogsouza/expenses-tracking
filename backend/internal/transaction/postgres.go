@@ -19,7 +19,6 @@ func NewRepository(db *gorm.DB) (Repository, error) {
 
 func (r *repository) Find(id entity.ID) (*entity.Transaction, error) {
 	var tr *entity.Transaction
-	defer r.db.Close()
 	err := r.db.First(&tr, id).Error
 	if err != nil {
 		return nil, err
@@ -29,7 +28,6 @@ func (r *repository) Find(id entity.ID) (*entity.Transaction, error) {
 
 func (r *repository) FindAll() ([]*entity.Transaction, error) {
 	var trs = []*entity.Transaction{}
-	defer r.db.Close()
 	err := r.db.Find(&trs).Error
 
 	if err != nil {
