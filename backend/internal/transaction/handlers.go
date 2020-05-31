@@ -13,8 +13,10 @@ import (
 	"github.com/go-chi/chi"
 )
 
+// GetURLParam is just an alias for chi.URLParam function
 var GetURLParam = chi.URLParam
 
+// Router is an interface that wraps the Routes methods which returns an chi.Router that contains all routes from this package
 type Router interface {
 	Routes() chi.Router
 }
@@ -23,6 +25,7 @@ type handler struct {
 	service Service
 }
 
+// NewHandler returns a router
 func NewHandler(serv Service) Router {
 	return &handler{serv}
 }
@@ -63,7 +66,7 @@ type transactionInput struct {
 	Description string                   `json:"description"`
 	Amount      float64                  `json:"amount"`
 	Date        time.Time                `json:"date"`
-	Status      entity.StatusTransaction `json: "status"`
+	Status      entity.StatusTransaction `json:"status"`
 }
 
 func (h *handler) Save(w http.ResponseWriter, r *http.Request) {

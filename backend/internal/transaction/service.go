@@ -11,6 +11,7 @@ type service struct {
 	repo Repository
 }
 
+// NewService create a instance of this service
 func NewService(repo Repository) Service {
 	return &service{repo}
 }

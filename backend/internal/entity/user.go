@@ -2,6 +2,7 @@ package entity
 
 import "time"
 
+// User represents an user which use the system
 type User struct {
 	ID        ID        `json:"id"`
 	Name      string    `json:"name"`
