@@ -6,12 +6,6 @@ import (
 )
 
 func RespondOK(w http.ResponseWriter, v interface{}) {
-
-	err := json.NewEncoder(w).Encode(v)
-	if err != nil {
-		RespondError(w, err, http.StatusInternalServerError)
-		return
-	}
 	respond(w, v, http.StatusOK)
 }
 
@@ -21,10 +15,14 @@ func RespondError(w http.ResponseWriter, err error, statusCode int) {
 }
 
 func respond(w http.ResponseWriter, v interface{}, statusCode int) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	response, _ := json.Marshal(v)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(response)
 }
 
 type ErrorResponse struct {
-	Code    int    `json:"code,omitempty"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
