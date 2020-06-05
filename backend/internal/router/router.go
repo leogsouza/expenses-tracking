@@ -9,6 +9,8 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httplog"
 	"github.com/jinzhu/gorm"
+	"github.com/leogsouza/expenses-tracking/server/internal/account"
+	"github.com/leogsouza/expenses-tracking/server/internal/category"
 	"github.com/leogsouza/expenses-tracking/server/internal/transaction"
 	"github.com/leogsouza/expenses-tracking/server/internal/user"
 )
@@ -47,6 +49,8 @@ func New(db *gorm.DB) http.Handler {
 	r.Route("/api", func(r chi.Router) {
 		r.Mount("/transactions", transactionRoutes(db))
 		r.Mount("/users", userRoutes(db))
+		r.Mount("/accounts", accountRoutes(db))
+		r.Mount("/categories", categoryRoutes(db))
 	})
 	return r
 
@@ -77,4 +81,26 @@ func userRoutes(db *gorm.DB) http.Handler {
 	serv := user.NewService(repo)
 
 	return user.NewHandler(serv).Routes()
+}
+
+func accountRoutes(db *gorm.DB) http.Handler {
+	repo, err := account.NewRepository(db)
+	if err != nil {
+		logger.Fatal().Err(err)
+	}
+
+	serv := account.NewService(repo)
+
+	return account.NewHandler(serv).Routes()
+}
+
+func categoryRoutes(db *gorm.DB) http.Handler {
+	repo, err := category.NewRepository(db)
+	if err != nil {
+		logger.Fatal().Err(err)
+	}
+
+	serv := category.NewService(repo)
+
+	return category.NewHandler(serv).Routes()
 }
