@@ -35,6 +35,7 @@ func (h *handler) Routes() chi.Router {
 
 	r.Get("/", h.GetAll)
 	r.Get("/{id}", h.Get)
+	r.Get("/{type}", h.GetAllByType)
 	r.Post("/", h.Save)
 	return r
 }
@@ -55,6 +56,15 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	responses.RespondOK(w, out)
+}
+
+func (h *handler) GetAllByType(w http.ResponseWriter, r *http.Request) {
+	out, err := h.service.FindAllByType(GetURLParam(r, "type"))
+	if err != nil {
+		responses.RespondError(w, fmt.Errorf("could not retrieve transactions: %v", err), http.StatusInternalServerError)
+		return
+	}
 	responses.RespondOK(w, out)
 }
 

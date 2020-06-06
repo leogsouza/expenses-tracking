@@ -8,6 +8,7 @@ import (
 type Reader interface {
 	Find(id entity.ID) (entity.Transaction, error)
 	FindAll() ([]entity.Transaction, error)
+	FindAllByType(tt string) ([]entity.Transaction, error)
 }
 
 // Writer is the interface that wraps the basic write data methods

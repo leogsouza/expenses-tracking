@@ -24,6 +24,10 @@ func (s *service) FindAll() ([]entity.Transaction, error) {
 	return s.repo.FindAll()
 }
 
+func (s *service) FindAllByType(tt string) ([]entity.Transaction, error) {
+	return s.repo.FindAllByType(tt)
+}
+
 func (s *service) Update(transaction *entity.Transaction) error {
 	return s.repo.Update(transaction)
 }

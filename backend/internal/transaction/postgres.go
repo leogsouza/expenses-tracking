@@ -37,6 +37,17 @@ func (r *repository) FindAll() ([]entity.Transaction, error) {
 	return trs, nil
 }
 
+func (r *repository) FindAllByType(tt string) ([]entity.Transaction, error) {
+	var trs = []entity.Transaction{}
+	err := r.db.Where("type = ?", tt).Find(&trs).Error
+
+	if err != nil {
+		return trs, err
+	}
+
+	return trs, nil
+}
+
 func (r *repository) Update(transaction *entity.Transaction) error {
 
 	return r.db.Save(&transaction).Error
