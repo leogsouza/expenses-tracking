@@ -1,7 +1,7 @@
 package account
 
 import (
-	"github.com/leogsouza/expenses-tracking/server/internal/entity"
+	"github.com/leogsouza/expenses-tracking/backend/internal/entity"
 )
 
 // Reader is the interface that wraps the basic find data methods

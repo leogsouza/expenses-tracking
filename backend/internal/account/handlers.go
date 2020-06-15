@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/leogsouza/expenses-tracking/server/internal/entity"
+	"github.com/leogsouza/expenses-tracking/backend/internal/entity"
 
-	"github.com/leogsouza/expenses-tracking/server/internal/util/responses"
+	"github.com/leogsouza/expenses-tracking/backend/internal/util/responses"
 
 	"github.com/go-chi/chi"
 )
@@ -56,6 +56,19 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responses.RespondOK(w, out)
+}
+
+func (h *handler) AccountCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var account entity.Account
+		var err error
+
+		if accountID := GetURLParam(r, "id"); accountID != "" {
+			account, err := h.service.Find(entity.ID(accountID))
+		} else {
+			responses.RespondError(w, fmt.Errorf("could not retrieve the account account: %v", err), http.StatusNotFound)
+		}
+	})
 }
 
 type accountInput struct {

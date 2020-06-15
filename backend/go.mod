@@ -1,4 +1,4 @@
-module github.com/leogsouza/expenses-tracking/server
+module github.com/leogsouza/expenses-tracking/backend
 
 go 1.13
 
