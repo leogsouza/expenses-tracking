@@ -16,15 +16,15 @@ type StatusTransaction string
 
 // Transaction represents a income or expense transaction
 type Transaction struct {
-	ID          ID
-	UserID      ID
-	Type        TypeTransaction
-	CategoryID  ID
-	AccountID   ID
-	Description string
-	Amount      float64
-	Date        time.Time
-	Status      StatusTransaction
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          ID                `json:"id,omitempty"`
+	UserID      ID                `json:"user_id,omitempty"`
+	Type        TypeTransaction   `json:"type,omitempty"`
+	CategoryID  ID                `json:"category_id,omitempty"`
+	AccountID   ID                `json:"account_id,omitempty"`
+	Description string            `json:"description,omitempty"`
+	Amount      float64           `json:"amount,omitempty"`
+	Date        time.Time         `json:"date,omitempty"`
+	Status      StatusTransaction `json:"status,omitempty"`
+	CreatedAt   time.Time         `json:"created_at,omitempty"`
+	UpdatedAt   time.Time         `json:"updated_at,omitempty"`
 }

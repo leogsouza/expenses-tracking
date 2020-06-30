@@ -2,11 +2,14 @@ package router
 
 import (
 	"encoding/json"
+	"flag"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/docgen"
 	"github.com/go-chi/httplog"
 	"github.com/jinzhu/gorm"
 	"github.com/leogsouza/expenses-tracking/backend/internal/account"
@@ -14,6 +17,8 @@ import (
 	"github.com/leogsouza/expenses-tracking/backend/internal/transaction"
 	"github.com/leogsouza/expenses-tracking/backend/internal/user"
 )
+
+var routes = flag.Bool("routes", false, "Generate router documentation")
 
 var logger = httplog.NewLogger("httplog-example", httplog.Options{
 	JSON: true,
@@ -52,6 +57,15 @@ func New(db *gorm.DB) http.Handler {
 		r.Mount("/accounts", accountRoutes(db))
 		r.Mount("/categories", categoryRoutes(db))
 	})
+
+	if *routes {
+		// fmt.Println(docgen.JSONRoutesDoc(r))
+		fmt.Println(docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
+			ProjectPath: "github.com/go-chi/chi",
+			Intro:       "Welcome to the chi/_examples/rest generated docs.",
+		}))
+		//return
+	}
 	return r
 
 }
