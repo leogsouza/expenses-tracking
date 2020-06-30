@@ -1,6 +1,6 @@
 package category
 
-import "github.com/leogsouza/expenses-tracking/server/internal/entity"
+import "github.com/leogsouza/expenses-tracking/backend/internal/entity"
 
 // Service is the interface that wraps all methods from Repository interface
 type Service interface {

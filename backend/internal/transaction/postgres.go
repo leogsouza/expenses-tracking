@@ -4,7 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	// to use sqlite with gorm
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/leogsouza/expenses-tracking/server/internal/entity"
+	"github.com/leogsouza/expenses-tracking/backend/internal/entity"
 )
 
 type repository struct {

@@ -9,10 +9,10 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httplog"
 	"github.com/jinzhu/gorm"
-	"github.com/leogsouza/expenses-tracking/server/internal/account"
-	"github.com/leogsouza/expenses-tracking/server/internal/category"
-	"github.com/leogsouza/expenses-tracking/server/internal/transaction"
-	"github.com/leogsouza/expenses-tracking/server/internal/user"
+	"github.com/leogsouza/expenses-tracking/backend/internal/account"
+	"github.com/leogsouza/expenses-tracking/backend/internal/category"
+	"github.com/leogsouza/expenses-tracking/backend/internal/transaction"
+	"github.com/leogsouza/expenses-tracking/backend/internal/user"
 )
 
 var logger = httplog.NewLogger("httplog-example", httplog.Options{

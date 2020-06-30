@@ -14,7 +14,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/leogsouza/expenses-tracking/server/internal/router"
+	"github.com/leogsouza/expenses-tracking/backend/internal/router"
 )
 
 func init() {

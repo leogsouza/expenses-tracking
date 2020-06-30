@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/leogsouza/expenses-tracking/server/internal/entity"
+	"github.com/leogsouza/expenses-tracking/backend/internal/entity"
 
-	"github.com/leogsouza/expenses-tracking/server/internal/util/responses"
+	"github.com/leogsouza/expenses-tracking/backend/internal/util/responses"
 
 	"github.com/go-chi/chi"
 )

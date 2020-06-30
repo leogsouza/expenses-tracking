@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/leogsouza/expenses-tracking/server/internal/entity"
+	"github.com/leogsouza/expenses-tracking/backend/internal/entity"
 
-	"github.com/leogsouza/expenses-tracking/server/internal/util/responses"
+	"github.com/leogsouza/expenses-tracking/backend/internal/util/responses"
 
 	"github.com/go-chi/chi"
 )
@@ -35,7 +35,7 @@ func (h *handler) Routes() chi.Router {
 
 	r.Get("/", h.GetAll)
 	r.Get("/{id}", h.Get)
-	r.Get("/{type}", h.GetAllByType)
+	r.Get("/type/{type}", h.GetAllByType)
 	r.Post("/", h.Save)
 	return r
 }
