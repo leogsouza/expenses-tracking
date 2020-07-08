@@ -37,9 +37,7 @@ func (h *handler) Routes() chi.Router {
 
 	r.Get("/", h.GetAll)
 	r.Get("/type/{type}", h.GetAllByType)
-	r.Get("/{id}", h.Get)
 	r.Post("/", h.Save)
-	r.Put("/{id}", h.Update)
 	r.Get("/", h.GetAll)
 	r.Route("/{id}", func(r chi.Router) {
 		r.Use(h.TransactionCtx)
