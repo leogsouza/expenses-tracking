@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -34,7 +35,11 @@ func (h *handler) Routes() chi.Router {
 	r := chi.NewRouter()
 
 	r.Get("/", h.GetAll)
-	r.Get("/{id}", h.Get)
+	r.Route("/{id}", func(r chi.Router) {
+		r.Use(h.UserCtx)
+		r.Get("/", h.Get)
+		r.Put("/", h.Update)
+	})
 	r.Post("/", h.Save)
 	return r
 }
@@ -55,6 +60,28 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.RespondOK(w, out)
+}
+
+func (h *handler) UserCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var user entity.User
+		var err error
+
+		if userID := GetURLParam(r, "id"); userID != "" {
+			user, err = h.service.Find(entity.ID(userID))
+		} else {
+			responses.RespondError(w, fmt.Errorf("user not found"), http.StatusNotFound)
+			return
+		}
+
+		if err != nil {
+			responses.RespondError(w, fmt.Errorf("could not retrieve a user: %v", err), http.StatusNotFound)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "user", &user)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 type userInput struct {
@@ -85,4 +112,16 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.RespondOK(w, out)
+}
+
+func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(*entity.User)
+	var in userInput
+	defer r.Body.Close()
+	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
+		responses.RespondError(w, fmt.Errorf("could not read the body request: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	user.Name = in.Name
 }
