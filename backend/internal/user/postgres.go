@@ -49,3 +49,13 @@ func (r *repository) Store(user *entity.User) (entity.ID, error) {
 	}
 	return user.ID, nil
 }
+
+func (r *repository) Login(email, password string) (entity.User, error) {
+	var user entity.User
+	err := r.db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}

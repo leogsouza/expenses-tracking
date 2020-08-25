@@ -31,3 +31,7 @@ func (s *service) Update(user *entity.User) error {
 func (s *service) Store(user *entity.User) (entity.ID, error) {
 	return s.repo.Store(user)
 }
+
+func (s *service) Login(email, password string) (entity.User, error) {
+	return s.repo.Login(email, password)
+}

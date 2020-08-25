@@ -8,6 +8,7 @@ import (
 type Reader interface {
 	Find(id entity.ID) (entity.User, error)
 	FindAll() ([]entity.User, error)
+	Login(email, password string) (entity.User, error)
 }
 
 // Writer is the interface that wraps the basic write data methods
