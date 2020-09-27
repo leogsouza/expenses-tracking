@@ -51,15 +51,15 @@ func (h *handler) Routes() chi.Router {
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	out, err := h.service.FindAll()
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not retrieve transactions: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not retrieve transactions: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }
 
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	out := r.Context().Value("transaction").(*entity.Transaction)
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }
 
 func (h *handler) TransactionCtx(next http.Handler) http.Handler {
@@ -70,12 +70,12 @@ func (h *handler) TransactionCtx(next http.Handler) http.Handler {
 		if transactionID := GetURLParam(r, "id"); transactionID != "" {
 			transaction, err = h.service.Find(entity.ID(transactionID))
 		} else {
-			responses.RespondError(w, fmt.Errorf("transaction not found"), http.StatusNotFound)
+			responses.RespondError(w, r, fmt.Errorf("transaction not found"), http.StatusNotFound)
 			return
 		}
 
 		if err != nil {
-			responses.RespondError(w, fmt.Errorf("could not retrieve a transaction: %v", err), http.StatusNotFound)
+			responses.RespondError(w, r, fmt.Errorf("could not retrieve a transaction: %v", err), http.StatusNotFound)
 			return
 		}
 
@@ -87,10 +87,10 @@ func (h *handler) TransactionCtx(next http.Handler) http.Handler {
 func (h *handler) GetAllByType(w http.ResponseWriter, r *http.Request) {
 	out, err := h.service.FindAllByType(GetURLParam(r, "type"))
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not retrieve transactions: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not retrieve transactions: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }
 
 type transactionInput struct {
@@ -108,7 +108,7 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 	var in transactionInput
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
-		responses.RespondError(w, fmt.Errorf("could not read the transaction body: %v", err), http.StatusBadRequest)
+		responses.RespondError(w, r, fmt.Errorf("could not read the transaction body: %v", err), http.StatusBadRequest)
 		return
 	}
 	createdAt := time.Now().UTC()
@@ -128,10 +128,10 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 	}
 	out, err := h.service.Store(transaction)
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not save the transaction: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not save the transaction: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
@@ -139,7 +139,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	var in transactionInput
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
-		responses.RespondError(w, fmt.Errorf("could not read the account body: %v", err), http.StatusBadRequest)
+		responses.RespondError(w, r, fmt.Errorf("could not read the account body: %v", err), http.StatusBadRequest)
 		return
 	}
 	updatedAt := time.Now().UTC()
@@ -153,14 +153,14 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	transaction.UpdatedAt = updatedAt
 
 	if err := h.service.Update(transaction); err != nil {
-		responses.RespondError(w, fmt.Errorf("could not update the transaction: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not update the transaction: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	out, err := h.service.Find(entity.ID(transaction.ID))
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not retrieve a account: %v", err), http.StatusNotFound)
+		responses.RespondError(w, r, fmt.Errorf("could not retrieve a account: %v", err), http.StatusNotFound)
 		return
 	}
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }

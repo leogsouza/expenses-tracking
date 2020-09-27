@@ -1,28 +1,22 @@
 package responses
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/go-chi/render"
 )
 
-func RespondOK(w http.ResponseWriter, v interface{}) {
-	respond(w, v, http.StatusOK)
+func RespondOK(w http.ResponseWriter, r *http.Request, v interface{}) {
+	render.JSON(w, r, v)
 }
 
-func RespondError(w http.ResponseWriter, err error, statusCode int) {
-	response := &ErrorResponse{statusCode, err.Error()}
-	respond(w, response, statusCode)
-}
+func RespondError(w http.ResponseWriter, r *http.Request, err error, statusCode int) {
 
-func respond(w http.ResponseWriter, v interface{}, statusCode int) {
-	response, _ := json.Marshal(v)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	w.Write(response)
-}
-
-type ErrorResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	response := &ErrorResponse{
+		Err:            err,
+		HTTPStatusCode: statusCode,
+		StatusText:     err.Error(),
+		ErrorText:      err.Error(),
+	}
+	render.Render(w, r, response)
 }

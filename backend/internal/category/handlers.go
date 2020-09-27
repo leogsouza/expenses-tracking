@@ -42,20 +42,20 @@ func (h *handler) Routes() chi.Router {
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	out, err := h.service.FindAll()
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not retrieve categories: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not retrieve categories: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }
 
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	out, err := h.service.Find(entity.ID(GetURLParam(r, "id")))
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not retrieve a category: %v", err), http.StatusNotFound)
+		responses.RespondError(w, r, fmt.Errorf("could not retrieve a category: %v", err), http.StatusNotFound)
 		return
 	}
 
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }
 
 type categoryInput struct {
@@ -66,7 +66,7 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 	var in categoryInput
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
-		responses.RespondError(w, fmt.Errorf("could not read the category body: %v", err), http.StatusBadRequest)
+		responses.RespondError(w, r, fmt.Errorf("could not read the category body: %v", err), http.StatusBadRequest)
 		return
 	}
 	createdAt := time.Now().UTC()
@@ -78,8 +78,8 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 	}
 	out, err := h.service.Store(category)
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not save the category: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not save the category: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responses.RespondOK(w, out)
+	responses.RespondOK(w, r, out)
 }

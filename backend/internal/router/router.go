@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/docgen"
 	"github.com/go-chi/httplog"
+	"github.com/go-chi/render"
 	"github.com/jinzhu/gorm"
 	"github.com/leogsouza/expenses-tracking/backend/internal/account"
 	"github.com/leogsouza/expenses-tracking/backend/internal/category"
@@ -37,6 +38,7 @@ func New(db *gorm.DB) http.Handler {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
+	r.Use(render.SetContentType(render.ContentTypeJSON))
 	r.Use(httplog.RequestLogger(logger))
 	r.Use(middleware.Heartbeat("/ping"))
 

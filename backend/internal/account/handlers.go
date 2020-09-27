@@ -12,6 +12,7 @@ import (
 	"github.com/leogsouza/expenses-tracking/backend/internal/util/responses"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 )
 
 // GetURLParam is just an alias for chi.URLParam function
@@ -47,15 +48,16 @@ func (h *handler) Routes() chi.Router {
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	out, err := h.service.FindAll()
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not retrieve accounts: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not retrieve accounts: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responses.RespondOK(w, out)
+	render.JSON(w, r, out)
+
 }
 
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	out := r.Context().Value("account").(*entity.Account)
-	responses.RespondOK(w, out)
+	render.JSON(w, r, out)
 }
 
 func (h *handler) AccountCtx(next http.Handler) http.Handler {
@@ -66,12 +68,12 @@ func (h *handler) AccountCtx(next http.Handler) http.Handler {
 		if accountID := GetURLParam(r, "id"); accountID != "" {
 			account, err = h.service.Find(entity.ID(accountID))
 		} else {
-			responses.RespondError(w, fmt.Errorf("account not found"), http.StatusNotFound)
+			responses.RespondError(w, r, fmt.Errorf("account not found"), http.StatusNotFound)
 			return
 		}
 
 		if err != nil {
-			responses.RespondError(w, fmt.Errorf("could not retrieve a account: %v", err), http.StatusNotFound)
+			responses.RespondError(w, r, fmt.Errorf("could not retrieve a account: %v", err), http.StatusNotFound)
 			return
 		}
 
@@ -88,7 +90,7 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 	var in accountInput
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
-		responses.RespondError(w, fmt.Errorf("could not read the account body: %v", err), http.StatusBadRequest)
+		responses.RespondError(w, r, fmt.Errorf("could not read the account body: %v", err), http.StatusBadRequest)
 		return
 	}
 	createdAt := time.Now().UTC()
@@ -100,10 +102,10 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 	}
 	out, err := h.service.Store(account)
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not save the account: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not save the account: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responses.RespondOK(w, out)
+	render.JSON(w, r, out)
 }
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
@@ -111,22 +113,22 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	var in accountInput
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
-		responses.RespondError(w, fmt.Errorf("could not read the account body: %v", err), http.StatusBadRequest)
+		responses.RespondError(w, r, fmt.Errorf("could not read the account body: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	account.Name = in.Name
 
 	if err := h.service.Update(account); err != nil {
-		responses.RespondError(w, fmt.Errorf("could not update the account: %v", err), http.StatusInternalServerError)
+		responses.RespondError(w, r, fmt.Errorf("could not update the account: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	out, err := h.service.Find(entity.ID(account.ID))
 	if err != nil {
-		responses.RespondError(w, fmt.Errorf("could not retrieve a account: %v", err), http.StatusNotFound)
+		responses.RespondError(w, r, fmt.Errorf("could not retrieve a account: %v", err), http.StatusNotFound)
 		return
 	}
 
-	responses.RespondOK(w, out)
+	render.JSON(w, r, out)
 }
