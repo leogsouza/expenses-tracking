@@ -14,7 +14,12 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/leogsouza/expenses-tracking/backend/internal/account"
+	"github.com/leogsouza/expenses-tracking/backend/internal/category"
+	"github.com/leogsouza/expenses-tracking/backend/internal/container"
 	"github.com/leogsouza/expenses-tracking/backend/internal/router"
+	"github.com/leogsouza/expenses-tracking/backend/internal/transaction"
+	"github.com/leogsouza/expenses-tracking/backend/internal/user"
 )
 
 func init() {
@@ -67,7 +72,18 @@ func main() {
 		return
 	}
 
-	r := router.New(db)
+	accRepo, _ := account.NewRepository(db)
+	catRepo, _ := category.NewRepository(db)
+	txRepo, _ := transaction.NewRepository(db)
+	userRepo, _ := user.NewRepository(db)
+
+	ctr := &container.Services{}
+	ctr.Account = account.NewService(accRepo)
+	ctr.Category = category.NewService(catRepo)
+	ctr.Transaction = transaction.NewService(txRepo)
+	ctr.User = user.NewService(userRepo)
+
+	r := router.New(ctr)
 
 	log.Printf("accepting connections on port %s", port)
 	if err := http.ListenAndServe(":"+port, r); err != nil {

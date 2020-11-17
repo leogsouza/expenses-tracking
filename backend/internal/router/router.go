@@ -12,9 +12,9 @@ import (
 	"github.com/go-chi/docgen"
 	"github.com/go-chi/httplog"
 	"github.com/go-chi/render"
-	"github.com/jinzhu/gorm"
 	"github.com/leogsouza/expenses-tracking/backend/internal/account"
 	"github.com/leogsouza/expenses-tracking/backend/internal/category"
+	"github.com/leogsouza/expenses-tracking/backend/internal/container"
 	"github.com/leogsouza/expenses-tracking/backend/internal/transaction"
 	"github.com/leogsouza/expenses-tracking/backend/internal/user"
 )
@@ -30,7 +30,7 @@ var logger = httplog.NewLogger("httplog-example", httplog.Options{
 	// },
 })
 
-func New(db *gorm.DB) http.Handler {
+func New(container *container.Services) http.Handler {
 
 	r := chi.NewRouter()
 
@@ -54,11 +54,13 @@ func New(db *gorm.DB) http.Handler {
 
 	r.Get("/", healthcheck)
 	r.Route("/api", func(r chi.Router) {
-		r.Mount("/transactions", transactionRoutes(db))
-		r.Mount("/users", userRoutes(db))
-		r.Mount("/accounts", accountRoutes(db))
-		r.Mount("/categories", categoryRoutes(db))
+		r.Mount("/transactions", transactionRoutes(container.Transaction))
+		r.Mount("/users", userRoutes(container.User))
+		r.Mount("/accounts", accountRoutes(container.Account))
+		r.Mount("/categories", categoryRoutes(container.Category))
 	})
+
+	flag.Parse()
 
 	if *routes {
 		// fmt.Println(docgen.JSONRoutesDoc(r))
@@ -77,46 +79,21 @@ func healthcheck(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
-func transactionRoutes(db *gorm.DB) http.Handler {
-	repo, err := transaction.NewRepository(db)
-	if err != nil {
-		logger.Fatal().Err(err)
-	}
-
-	serv := transaction.NewService(repo)
+func transactionRoutes(serv transaction.Service) http.Handler {
 
 	return transaction.NewHandler(serv).Routes()
 }
 
-func userRoutes(db *gorm.DB) http.Handler {
-	repo, err := user.NewRepository(db)
-	if err != nil {
-		logger.Fatal().Err(err)
-	}
-
-	serv := user.NewService(repo)
+func userRoutes(serv user.Service) http.Handler {
 
 	return user.NewHandler(serv).Routes()
 }
 
-func accountRoutes(db *gorm.DB) http.Handler {
-	repo, err := account.NewRepository(db)
-	if err != nil {
-		logger.Fatal().Err(err)
-	}
-
-	serv := account.NewService(repo)
+func accountRoutes(serv account.Service) http.Handler {
 
 	return account.NewHandler(serv).Routes()
 }
 
-func categoryRoutes(db *gorm.DB) http.Handler {
-	repo, err := category.NewRepository(db)
-	if err != nil {
-		logger.Fatal().Err(err)
-	}
-
-	serv := category.NewService(repo)
-
+func categoryRoutes(serv category.Service) http.Handler {
 	return category.NewHandler(serv).Routes()
 }
