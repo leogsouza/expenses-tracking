@@ -63,7 +63,7 @@ func main() {
 	// Migrate the schema
 	err = dbMigration(db.DB())
 	if err != nil {
-		log.Fatalf("could not proecess the db migration: %v\n", err)
+		log.Fatalf("could not process the db migration: %v\n", err)
 		return
 	}
 
@@ -123,5 +123,6 @@ func dbMigration(db *sql.DB) error {
 		log.Fatal(err)
 		return err
 	}
+
 	return nil
 }

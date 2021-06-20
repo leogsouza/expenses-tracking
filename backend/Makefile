@@ -1,29 +1,20 @@
-PROGRAM=ssdown
-
-.PHONY: format
-format:
-	@find . -type f -name "*.go*" -print0 | xargs -0 gofmt -s -w
-
-.PHONY: clean
+GO_CMD=go
+GO_BUILD=${GO_CMD} build
+BINARY_NAME=tracking
+BIN_DIR=bin
 clean:
-	@go clean ./...
+	rm -rf bin/*
 
-.PHONY: build
-build:
-	@go build -o bin/$(PROGRAM) 
+build-linux:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 ${GO_BUILD} -o ${BIN_DIR}/${BINARY_NAME}
+build-windows:
+	GOOS=windows GOARCH=amd64 ${GO_BUILD} -o ${BIN_DIR}/${BINARY_NAME}.exe
+build: build-linux build-windows
 
 execute:
-	./bin/$(PROGRAM)
+	./${BIN_DIR}/${BINARY_NAME}.exe
 
 run: build execute
 
-dev: 
-	modd
-
-.PHONY: test
 test:
-	@go test -cover -race ./...
-
-.PHONY: bench
-bench:
-	@go test -bench=. -benchmem
+	go test -cover -race ./...
