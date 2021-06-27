@@ -3,6 +3,7 @@ module github.com/leogsouza/expenses-tracking/backend
 go 1.13
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/go-chi/chi v4.1.1+incompatible
 	github.com/go-chi/cors v1.1.1
 	github.com/go-chi/docgen v1.0.5
