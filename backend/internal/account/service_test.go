@@ -37,7 +37,7 @@ func (mock *MockRepository) FindAll() ([]entity.Account, error) {
 
 func (mock *MockRepository) Update(account *entity.Account) error {
 	args := mock.Called()
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (mock *MockRepository) Store(account *entity.Account) (entity.ID, error) {
@@ -94,7 +94,7 @@ func TestFind(t *testing.T) {
 	account := entity.Account{ID: identifier, Name: "Wallet"}
 
 	// setup expectations
-	mockRepo.On("Find").Return([]entity.Account{account}, nil)
+	mockRepo.On("Find").Return(account, nil)
 
 	testService := NewService(mockRepo)
 
@@ -106,5 +106,23 @@ func TestFind(t *testing.T) {
 	// Data Assertion
 	assert.Equal(t, "1uBp2CH2furqtZoM0lgWqcu9WRE", result.ID.String())
 	assert.Equal(t, "Wallet", result.Name)
+	assert.Nil(t, err)
+}
+
+func TestUpdate(t *testing.T) {
+	mockRepo := new(MockRepository)
+
+	account := entity.Account{ID: "1uBp2CH2furqtZoM0lgWqcu9WRE", Name: "Wallet"}
+
+	mockRepo.On("Update").Return(nil)
+
+	testService := NewService(mockRepo)
+
+	err := testService.Update(&account)
+
+	// Mock Assertion
+	mockRepo.AssertExpectations(t)
+
+	// Data Assertion
 	assert.Nil(t, err)
 }
