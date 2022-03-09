@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -20,12 +21,13 @@ import (
 	"github.com/leogsouza/expenses-tracking/backend/internal/router"
 	"github.com/leogsouza/expenses-tracking/backend/internal/transaction"
 	"github.com/leogsouza/expenses-tracking/backend/internal/user"
+	"github.com/tinrab/kit/retry"
 )
 
 func init() {
 	// loads values from .env into the system
 	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
+		log.Print("No .env file found to be loaded")
 	}
 }
 
@@ -49,27 +51,34 @@ func main() {
 		databaseAddr = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 			cfg.PostgresHost, cfg.PostgresPort, cfg.PostgresUser, cfg.PostgresDB, cfg.PostgresPassword)
 		port = env("PORT", "8080")
+		db   *gorm.DB
 	)
 
 	// Logger
-	db, err := gorm.Open("postgres", databaseAddr)
+	log.Println("DatabaseAddr", databaseAddr)
 
-	if err != nil {
-		log.Fatalf("could not open db connection: %v\n", err)
-		return
-	}
+	retry.ForeverSleep(2*time.Second, func(attempt int) error {
+		db, err = gorm.Open("postgres", databaseAddr)
+
+		if err != nil {
+			log.Printf("could not open db connection: %v\n", err)
+			return err
+		}
+		return nil
+	})
+
 	defer db.Close()
 
 	// Migrate the schema
 	err = dbMigration(db.DB())
 	if err != nil {
-		log.Fatalf("could not process the db migration: %v\n", err)
-		return
+		log.Printf("could not process the db migration: %v\n", err)
+		//return
 	}
 
 	if err = db.DB().Ping(); err != nil {
-		log.Fatalf("could not ping to db: %v\n", err)
-		return
+		log.Printf("could not ping to db: %v\n", err)
+		//return
 	}
 
 	accRepo, _ := account.NewRepository(db)
@@ -109,18 +118,18 @@ func dbMigration(db *sql.DB) error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://db/migrations",
+		"file:///app/db/migrations",
 		"expenses",
 		driver)
-	log.Println("Initiation migration")
+	log.Println("Starting migration")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 
 	log.Println("Executing migration")
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 

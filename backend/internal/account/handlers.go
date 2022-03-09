@@ -21,6 +21,7 @@ var GetURLParam = chi.URLParam
 // Router is an interface that wraps the Routes methods which returns an chi.Router that contains all routes from this package
 type Router interface {
 	Routes() chi.Router
+	GetAll(w http.ResponseWriter, r *http.Request)
 }
 
 type handler struct {

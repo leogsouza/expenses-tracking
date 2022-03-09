@@ -18,23 +18,23 @@ func NewRepository(db *gorm.DB) (Repository, error) {
 }
 
 func (r *repository) Find(id entity.ID) (entity.Account, error) {
-	var tr entity.Account
-	err := r.db.Where("id = ?", id).First(&tr).Error
+	var acc entity.Account
+	err := r.db.Where("id = ?", id).First(&acc).Error
 	if err != nil {
-		return tr, err
+		return acc, err
 	}
-	return tr, nil
+	return acc, nil
 }
 
 func (r *repository) FindAll() ([]entity.Account, error) {
-	var trs = []entity.Account{}
-	err := r.db.Find(&trs).Error
+	var accs = []entity.Account{}
+	err := r.db.Find(&accs).Error
 
 	if err != nil {
-		return trs, err
+		return accs, err
 	}
 
-	return trs, nil
+	return accs, nil
 }
 
 func (r *repository) Update(account *entity.Account) error {
