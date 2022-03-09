@@ -17,5 +17,6 @@ require (
 	github.com/segmentio/ksuid v1.0.2
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/stretchr/testify v1.7.0
+	github.com/tinrab/kit v0.0.0-20190329160841-0e7c24974f7e
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
