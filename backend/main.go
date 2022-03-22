@@ -118,7 +118,7 @@ func dbMigration(db *sql.DB) error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:///app/db/migrations",
+		"file://db/migrations",
 		"expenses",
 		driver)
 	log.Println("Starting migration")

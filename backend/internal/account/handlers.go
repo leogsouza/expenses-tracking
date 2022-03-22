@@ -21,15 +21,22 @@ var GetURLParam = chi.URLParam
 // Router is an interface that wraps the Routes methods which returns an chi.Router that contains all routes from this package
 type Router interface {
 	Routes() chi.Router
-	GetAll(w http.ResponseWriter, r *http.Request)
 }
+
+type AccountRouter interface {
+	Router
+	GetAll(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+}
+
+var contextKey string = "account"
 
 type handler struct {
 	service Service
 }
 
 // NewHandler returns a router
-func NewHandler(serv Service) Router {
+func NewHandler(serv Service) AccountRouter {
 	return &handler{serv}
 }
 
@@ -57,7 +64,8 @@ func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
-	out := r.Context().Value("account").(*entity.Account)
+	fmt.Println("URLParam", r.RequestURI)
+	out := r.Context().Value(contextKey).(*entity.Account)
 	render.JSON(w, r, out)
 }
 
@@ -65,7 +73,6 @@ func (h *handler) AccountCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var account entity.Account
 		var err error
-
 		if accountID := GetURLParam(r, "id"); accountID != "" {
 			account, err = h.service.Find(entity.ID(accountID))
 		} else {
@@ -78,7 +85,7 @@ func (h *handler) AccountCtx(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "account", &account)
+		ctx := context.WithValue(r.Context(), contextKey, &account)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -110,7 +117,7 @@ func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
-	account := r.Context().Value("account").(*entity.Account)
+	account := r.Context().Value(contextKey).(*entity.Account)
 	var in accountInput
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
