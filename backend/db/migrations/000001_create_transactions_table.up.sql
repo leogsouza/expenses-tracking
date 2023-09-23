@@ -9,15 +9,11 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()  
 );
 
-INSERT INTO users (id, name, email, password, created_at) VALUES ('123456', 'Leonardo', 'teste@teste.com', '12345678', now());
-
 CREATE TABLE IF NOT EXISTS accounts (
   id pk PRIMARY KEY,
   name VARCHAR(45) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()  
 );
-
-INSERT INTO accounts (id, name, created_at) VALUES ('123456', 'Carteira', now());
 
 CREATE TYPE transaction_type AS ENUM ('Expense', 'Income');
 CREATE TYPE transaction_status AS ENUM('Pending', 'Outdated', 'Paid');
